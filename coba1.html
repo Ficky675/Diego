@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Monitoring Kandang Ayam</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2d4a7a 0%, #1e3c72 100%);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .chicken-logo {
+            width: 80px;
+            height: 80px;
+            background: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            position: relative;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .chicken-emoji {
+            font-size: 60px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+            60% { transform: translateY(-3px); }
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .header-subtitle {
+            font-size: 16px;
+            color: #a0c4ff;
+        }
+
+        .current-time {
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6; }
+            to { text-shadow: 0 0 10px #fff, 0 0 20px #0073e6, 0 0 30px #0073e6; }
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(30, 60, 114, 0.8);
+            border: 2px solid #4a6fa5;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            border-color: #64b5f6;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #a0c4ff;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            transition: color 0.3s ease;
+        }
+
+        .kandangku-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        /* Bottom Cards */
+        .bottom-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-card {
+            border-radius: 15px;
+            padding: 20px;
+            color: white;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .info-card:hover {
+            transform: scale(1.02);
+        }
+
+        .light-card {
+            background: linear-gradient(135deg, #ff9500 0%, #ffb347 100%);
+        }
+
+        .elevation-card {
+            background: linear-gradient(135deg, #2d4a7a 0%, #1e3c72 100%);
+            border: 2px solid #4a6fa5;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card-icon {
+            font-size: 20px;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .card-status {
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: bold;
+            animation: countUp 2s ease-out;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Temperature Section */
+        .temp-section {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .temp-label {
+            font-size: 16px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .temp-value {
+            font-size: 64px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 20px rgba(255,255,255,0.5);
+            animation: temperaturePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes temperaturePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .temp-recommendation {
+            background: rgba(46, 125, 50, 0.8);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 15px;
+            display: inline-block;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .temperature-gauge {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .gauge-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                from 0deg,
+                #4caf50 0deg 120deg,
+                #ff9800 120deg 240deg,
+                #f44336 240deg 360deg
+            );
+            position: relative;
+        }
+
+        .gauge-inner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            background: rgba(30, 60, 114, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Chart */
+        .chart-container {
+            background: rgba(30, 60, 114, 0.8);
+            border: 2px solid #4a6fa5;
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            border-color: #64b5f6;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .chart-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .chart-area {
+            height: 120px;
+            background: linear-gradient(to bottom, rgba(255,215,0,0.3) 0%, rgba(100,149,237,0.3) 50%, rgba(255,20,147,0.3) 100%);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-line {
+            position: absolute;
+            top: 20%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #ffd700;
+            animation: wave 2s ease-in-out infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        .chart-data-point {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ffd700;
+            border-radius: 50%;
+            animation: dataPoint 3s infinite;
+        }
+
+        @keyframes dataPoint {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.2); }
+        }
+
+        /* Control Panel */
+        .control-panel {
+            background: rgba(30, 60, 114, 0.8);
+            border: 2px solid #4a6fa5;
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .control-item {
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .kipas {
+            background: linear-gradient(135deg, #ff5722 0%, #ff1744 100%);
+        }
+
+        .pompa {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+        }
+
+        .pakan {
+            background: linear-gradient(135deg, #ff9500 0%, #f57c00 100%);
+        }
+
+        .control-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-icon {
+            font-size: 16px;
+            animation: spin 2s linear infinite;
+        }
+
+        .control-icon.stopped {
+            animation: none;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .control-name {
+            font-weight: bold;
+        }
+
+        .control-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .control-button {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .control-button:active {
+            transform: scale(0.95);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #ff4444;
+            border-radius: 50%;
+            margin-left: 5px;
+            animation: blink 2s infinite;
+        }
+
+        .status-dot.active {
+            background: #4caf50;
+            animation: steadyGlow 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        @keyframes steadyGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Status indicators */
+        .status-ideal {
+            color: #4caf50;
+            text-shadow: 0 0 10px #4caf50;
+        }
+
+        .status-warning {
+            color: #ff9800;
+            text-shadow: 0 0 10px #ff9800;
+        }
+
+        .status-critical {
+            color: #f44336;
+            text-shadow: 0 0 10px #f44336;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bottom-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .temp-value {
+                font-size: 48px;
+            }
+        }
+
+        /* Loading animation for data updates */
+        .updating {
+            animation: updatePulse 1s ease-in-out;
+        }
+
+        @keyframes updatePulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <!-- Header -->
+            <div class="header">
+                <div class="chicken-logo">
+                    <span class="chicken-emoji">🐔</span>
+                </div>
+                <div class="header-content">
+                    <div class="header-title">DASHBOARD MONITORING KANDANG AYAM</div>
+                    <div class="header-subtitle">Selamat Datang! <span style="color: #4fc3f7;">Ayam Sehat, Telurpun Lezat!</span></div>
+                </div>
+                <div class="current-time" id="currentTime">13:41:30</div>
+            </div>
+
+            <!-- Stats Section -->
+            <div>
+                <div class="kandangku-title">Kandangku</div>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-icon">🐔</div>
+                        <div class="stat-label">Jumlah Ayam</div>
+                        <div class="stat-value" id="jumlahAyam">3200 ekor</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🥘</div>
+                        <div class="stat-label">Jumlah Pakan</div>
+                        <div class="stat-value" id="jumlahPakan">510 Kg</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💧</div>
+                        <div class="stat-label">Air Minum</div>
+                        <div class="stat-value" id="airMinum">180 L</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Cards -->
+            <div class="bottom-cards">
+                <div class="info-card light-card">
+                    <div class="card-header">
+                        <span class="card-icon">💡</span>
+                        <span class="card-title">Intensitas Cahaya</span>
+                    </div>
+                    <div class="card-status">Status Lampu: <strong>MENYALA</strong> ⚙️</div>
+                    <div class="card-value" id="intensitasCahaya">48699 Lux</div>
+                </div>
+                <div class="info-card elevation-card">
+                    <div class="card-header">
+                        <span class="card-icon">🏔️</span>
+                        <span class="card-title">Ketinggian Lokasi</span>
+                    </div>
+                    <div class="card-status">Dari permukaan laut</div>
+                    <div class="card-value" id="ketinggianLokasi">452.8 mdpl</div>
+                </div>
+            </div>
+
+            <!-- Temperature Section -->
+            <div class="temp-section">
+                <div class="temp-label">🌡️ Suhu Kandang</div>
+                <div class="temp-label">Status: <span id="statusSuhu" class="status-ideal">IDEAL</span></div>
+                <div class="temp-value" id="suhuKandang">27.6°C</div>
+                <div class="temp-recommendation">Rekomendasi: 24-30°C untuk ayam petelur</div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <!-- Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <span>📊</span>
+                    <span class="chart-title">Grafik Suhu & Kelembapan</span>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffd700;"></div>
+                        <span>Suhu (°C)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #64b5f6;"></div>
+                        <span>Kelembapan (%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff1744;"></div>
+                        <span>Tekanan (hPa)</span>
+                    </div>
+                </div>
+                <div class="chart-area" id="chartArea">
+                    <div class="chart-line"></div>
+                    <!-- Data points will be added by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="control-title">Kontrol Peralatan</div>
+                
+                <div class="control-item kipas" id="kipasControl">
+                    <div class="control-info">
+                        <span class="control-icon stopped" id="kipasIcon">🌪️</span>
+                        <div>
+                            <div class="control-name">Kipas</div>
+                            <div class="control-status" id="kipasStatus">Status: ⭕ Mati <span class="status-dot" id="kipasDot"></span></div>
+                        </div>
+                    </div>
+                    <button class="control-button" id="kipasButton" onclick="toggleDevice('kipas')">
+                        <span>🔴</span> Nyalakan
+                    </button>
+                </div>
+
+                <div class="control-item pompa" id="pompaControl">
+                    <div class="control-info">
+                        <span class="control-icon stopped" id="pompaIcon">💧</span>
+                        <div>
+                            <div class="control-name">Pompa</div>
+                            <div class="control-status" id="pompaStatus">Status: ⭕ Mati <span class="status-dot" id="pompaDot"></span></div>
+                        </div>
+                    </div>
+                    <button class="control-button" id="pompaButton" onclick="toggleDevice('pompa')">
+                        <span>🔴</span> Nyalakan
+                    </button>
+                </div>
+
+                <div class="control-item pakan" id="pakanControl">
+                    <div class="control-info">
+                        <span class="control-icon stopped" id="pakanIcon">🍽️</span>
+                        <div>
+                            <div class="control-name">Pakan</div>
+                            <div class="control-status" id="pakanStatus">Status: ⭕ Mati <span class="status-dot" id="pakanDot"></span></div>
+                        </div>
+                    </div>
+                    <button class="control-button" id="pakanButton" onclick="toggleDevice('pakan')">
+                        <span>🔴</span> Nyalakan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data simulation variables
+        let deviceStates = {
+            kipas: false,
+            pompa: false,
+            pakan: false
+        };
+
+        let sensorData = {
+            temperature: 27.6,
+            humidity: 65,
+            pressure: 1013.25,
+            lightIntensity: 48699,
+            chickens: 3200,
+            feed: 510,
+            water: 180,
+            elevation: 452.8
+        };
+
+        // Update time every second
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // Simulate realistic sensor data changes
+        function updateSensorData() {
+            // Temperature fluctuation (24-32°C range)
+            sensorData.temperature += (Math.random() - 0.5) * 0.5;
+            sensorData.temperature = Math.max(24, Math.min(32, sensorData.temperature));
+
+            // Humidity fluctuation (40-80% range)
+            sensorData.humidity += (Math.random() - 0.5) * 2;
+            sensorData.humidity = Math.max(40, Math.min(80, sensorData.humidity));
+
+            // Light intensity variation (day/night cycle simulation)
+            const hour = new Date().getHours();
+            const baseIntensity = hour >= 6 && hour <= 18 ? 45000 : 5000;
+            sensorData.lightIntensity = baseIntensity + (Math.random() * 10000);
+
+            // Feed consumption simulation (decreases slowly)
+            if (deviceStates.pakan) {
+                sensorData.feed -= Math.random() * 0.5;
+                sensorData.feed = Math.max(0, sensorData.feed);
+            }
+
+            // Water consumption simulation (decreases slowly)
+            if (deviceStates.pompa) {
+                sensorData.water -= Math.random() * 0.2;
+                sensorData.water = Math.max(0, sensorData.water);
+            }
+
+            // Chicken count slight variation (stress, movement)
+            sensorData.chickens += Math.round((Math.random() - 0.5) * 5);
+            sensorData.chickens = Math.max(3190, Math.min(3210, sensorData.chickens));
+        }
+
+        // Update display with current sensor data
+        function updateDisplay() {
+            // Add updating animation
+            document.getElementById('suhuKandang').classList.add('updating');
+            document.getElementById('jumlahAyam').classList.add('updating');
+
+            // Update temperature
+            document.getElementById('suhuKandang').textContent = sensorData.temperature.toFixed(1) + '°C';
+            
+            // Update temperature status
+            const statusElement = document.getElementById('statusSuhu');
+            if (sensorData.temperature >= 24 && sensorData.temperature <= 30) {
+                statusElement.textContent = 'IDEAL';
+                statusElement.className = 'status-ideal';
+            } else if (sensorData.temperature > 30 && sensorData.temperature <= 32) {
+                statusElement.textContent = 'TINGGI';
+                statusElement.className = 'status-warning';
+            } else if (sensorData.temperature > 32) {
+                statusElement.textContent = 'BAHAYA';
+                statusElement.className = 'status-critical';
+            } else {
+                statusElement.textContent = 'RENDAH';
+                statusElement.className = 'status-warning';
+            }
+
+            // Update other values
+            document.getElementById('jumlahAyam').textContent = sensorData.chickens + ' ekor';
+            document.getElementById('jumlahPakan').textContent = Math.round(sensorData.feed) + ' Kg';
+            document.getElementById('airMinum').textContent = Math.round(sensorData.water) + ' L';
+            document.getElementById('intensitasCahaya').textContent = Math.round(sensorData.lightIntensity) + ' Lux';
+
+            // Remove updating animation after a delay
+            setTimeout(() => {
+                document.getElementById('suhuKandang').classList.remove('updating');
+                document.getElementById('jumlahAyam').classList.remove('updating');
+            }, 1000);
+        }
+
+        // Toggle device state
+        function toggleDevice(deviceType) {
+            const isOn = deviceStates[deviceType];
+            const button = document.getElementById(deviceType + 'Button');
+            const statusElement = document.getElementById(deviceType + 'Status');
+            const statusDot = document.getElementById(deviceType + 'Dot');
+            const icon = document.getElementById(deviceType + 'Icon');
+            
+            if (isOn) {
+                // Turn off
+                deviceStates[deviceType] = false;
+                button.innerHTML = '<span>🔴</span> Nyalakan';
+                statusElement.innerHTML = 'Status: ⭕ Mati <span class="status-dot" id="' + deviceType + 'Dot"></span>';
+                icon.classList.add('stopped');
+                statusDot.classList.remove('active');
+                
+                // Show notification
+                showNotification(deviceType.charAt(0).toUpperCase() + deviceType.slice(1) + ' telah dimatikan', 'info');
+            } else {
+                // Turn on
+                deviceStates[deviceType] = true;
+                button.innerHTML = '<span>🟢</span> Matikan';
+                statusElement.innerHTML = 'Status: ✅ Hidup <span class="status-dot active" id="' + deviceType + 'Dot"></span>';
+                icon.classList.remove('stopped');
+                statusDot.classList.add('active');
+                
+                // Show notification
+                showNotification(deviceType.charAt(0).toUpperCase() + deviceType.slice(1) + ' telah dinyalakan', 'success');
+            }
+
+            // Update dot reference
+            const newDot = document.getElementById(deviceType + 'Dot');
+            if (deviceStates[deviceType]) {
+                newDot.classList.add('active');
